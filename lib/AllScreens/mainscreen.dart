@@ -2,12 +2,19 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:rider_app/AllScreens/searchScreen.dart';
 import 'package:rider_app/AllWidgets/Divider.dart';
+import 'package:rider_app/Assistants/assistantMethods.dart';
+import 'package:rider_app/DataHandler/appData.dart';
+import 'package:rider_app/Models/address.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "mainScreen";
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -30,6 +37,9 @@ class _MainScreenState extends State<MainScreen> {
         new CameraPosition(target: latLonPosition, zoom: 14);
     newGoogleMapController
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    String address =
+        await AssistantMethods.searchCoordinateAddress(position, context);
+    print("This is your Address ::" + address);
   }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
@@ -38,14 +48,23 @@ class _MainScreenState extends State<MainScreen> {
   );
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      AppData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.yellowAccent,
+        backgroundColor: Colors.black,
         title: Text(
           "Main Screen",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.white),
         ),
       ),
       drawer: Container(
@@ -129,7 +148,7 @@ class _MainScreenState extends State<MainScreen> {
             newGoogleMapController = controller;
 
             setState(() {
-              bottomPaddingOfMap = 265.0;
+              bottomPaddingOfMap = 300.0;
             });
 
             locatePosition();
@@ -215,32 +234,40 @@ class _MainScreenState extends State<MainScreen> {
                     SizedBox(
                       height: 20.0,
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black54,
-                            blurRadius: 6.0,
-                            spreadRadius: 0.5,
-                            offset: Offset(0.7, 0.7),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search,
-                              color: Colors.black,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SearchScreen()));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black54,
+                              blurRadius: 6.0,
+                              spreadRadius: 0.5,
+                              offset: Offset(0.7, 0.7),
                             ),
-                            SizedBox(
-                              width: 10.0,
-                            ),
-                            Text("Search drop off ")
                           ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Text("Search drop off ")
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -259,7 +286,17 @@ class _MainScreenState extends State<MainScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Add Home"),
+                            // ignore: unnecessary_null_comparison
+
+                            // ignore: unnecessary_null_comparison
+
+                            Text(Provider.of<AppData>(context).pickUpLocation !=
+                                    null
+                                ? Provider.of<AppData>(context)
+                                    .pickUpLocation!
+                                    .placeName
+                                    .toString()
+                                : "Add Home"),
                             SizedBox(
                               height: 4.0,
                             ),
