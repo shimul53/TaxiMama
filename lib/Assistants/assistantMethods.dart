@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
@@ -23,7 +25,7 @@ class AssistantMethods {
       // placeAddress = response["results"][0]["formatted_address"];
       st1 = response["results"][0]["address_components"][0]["long_name"];
       st2 = response["results"][0]["address_components"][1]["long_name"];
-      st3 = response["results"][0]["address_components"][5]["long_name"];
+      st3 = response["results"][0]["address_components"][2]["long_name"];
       // st4 = response["results"][0]["address_components"][6]["long_name"];
       placeAddress = st1 + ", " + st2 + ", " + st3;
 
@@ -62,7 +64,7 @@ class AssistantMethods {
     return directionDetails;
   }
 
-  static int? calculateFares(DirectionDetails directionDetails) {
+  static int calculateFares(DirectionDetails directionDetails) {
     //in terms USD
     double timeTraveledFare = (directionDetails.durationValue! / 60) * 0.20;
     double distanceTraveledFare =
@@ -70,9 +72,9 @@ class AssistantMethods {
     double totalFareAmount = timeTraveledFare + distanceTraveledFare;
     //local currency
     //1$ = 84 taka
-    // double totalLocalAmount = totalFareAmount * 84;
+    double totalLocalAmount = totalFareAmount * 84;
 
-    return totalFareAmount.truncate();
+    return totalLocalAmount.truncate();
   }
 
   static void getCurrentOnlineUserInfo() async {
@@ -85,5 +87,11 @@ class AssistantMethods {
         userCurrentInfo = Users.fromSnapshot(dataSnapshot);
       }
     });
+  }
+
+  static double createRandomNumber(int num) {
+    var random = Random();
+    int radNumber = random.nextInt(num);
+    return radNumber.toDouble();
   }
 }
