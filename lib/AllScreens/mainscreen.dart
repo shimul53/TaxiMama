@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:rider_app/AllScreens/loginScreen.dart';
 import 'package:rider_app/AllScreens/searchScreen.dart';
 import 'package:rider_app/AllWidgets/Divider.dart';
+import 'package:rider_app/AllWidgets/noDriverAvailableDialog.dart';
 import 'package:rider_app/AllWidgets/progressDialog.dart';
 import 'package:rider_app/Assistants/assistantMethods.dart';
 import 'package:rider_app/Assistants/geoFireAssistant.dart';
@@ -22,6 +23,7 @@ import 'package:rider_app/Models/address.dart';
 import 'package:rider_app/Models/directDetails.dart';
 import 'package:rider_app/Models/nearbyAvailableDrivers.dart';
 import 'package:rider_app/configMaps.dart';
+import 'package:rider_app/main.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "mainScreen";
@@ -56,6 +58,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   DatabaseReference? rideRequestRef;
 
   BitmapDescriptor? nearbyIcon;
+
+  List<NearbyAvailableDrivers>? availableDrivers;
 
   @override
   void initState() {
@@ -101,7 +105,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     setState(() {
       requestRideDetailsContainerHeight = 250.0;
       rideDetailsContainerHeight = 0;
-      bottomPaddingOfMap = 230.0;
+      bottomPaddingOfMap = 270.0;
       drawerOpen = true;
     });
     saveRideRequest();
@@ -166,27 +170,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     zoom: 14.4746,
   );
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   setState(() {
-  //     AppData();
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     createIconMarker();
     return Scaffold(
       key: scaffoldKey,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.black,
-      //   title: Text(
-      //     "",
-      //     style: TextStyle(color: Colors.white),
-      //   ),
-      // ),
       drawer: Container(
         color: Colors.black,
         width: 255.0,
@@ -613,6 +601,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       child: RaisedButton(
                         onPressed: () {
                           displayRequestRideContainer();
+                          availableDrivers =
+                              GeoFireAssistant.nearbyAvailableDriversList;
+                          searchNearestDriver();
                         },
                         color: Theme.of(context).accentColor,
                         child: Padding(
@@ -793,7 +784,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       polylineSet.add(polyline);
     });
     LatLngBounds latLngBounds;
-    if (pickUpLatLng.longitude > dropOffLatLng.latitude &&
+    if (pickUpLatLng.latitude > dropOffLatLng.latitude &&
         pickUpLatLng.longitude > dropOffLatLng.longitude) {
       latLngBounds =
           LatLngBounds(southwest: dropOffLatLng, northeast: pickUpLatLng);
@@ -940,5 +931,40 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         nearbyIcon = value;
       });
     }
+  }
+
+  void noDriverFound() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => NoDriverAvailableDialog());
+  }
+
+  void searchNearestDriver() {
+    if (availableDrivers!.length == 0) {
+      cancelRideRequest();
+      resetApp();
+      noDriverFound();
+      return;
+    }
+    var driver = availableDrivers![0];
+    notifyDriver(driver);
+    availableDrivers!.removeAt(0);
+  }
+
+  void notifyDriver(NearbyAvailableDrivers driver) {
+    driversRef.child(driver.key).child("newRide").set(rideRequestRef!.key);
+
+    driversRef
+        .child(driver.key)
+        .child("token")
+        .once()
+        .then((DataSnapshot snap) {
+      if (snap.value != null) {
+        String token = snap.value.toString();
+        AssistantMethods.sendNotificationToDriver(
+            token, context, rideRequestRef!.key);
+      }
+    });
   }
 }
