@@ -29,6 +29,7 @@ dependencies:
   animated_text_kit: ^4.2.1
   flutter_geofire: ^1.0.3
   url_launcher: ^5.7.10
+  smooth_star_rating: ^1.1.1
 
 
 
@@ -56,6 +57,9 @@ flutter:
      - images/redmarker.png
      - images/taxi.png
      - images/user_icon.png
+     - images/bike.png
+     - images/ubergo.png
+     - images/uberx.png
 
 
 
