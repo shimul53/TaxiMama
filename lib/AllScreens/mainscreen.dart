@@ -70,6 +70,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   StreamSubscription<Event>? rideStreamSubscription;
   bool isRequestingPositionDetails = false;
 
+  String uName = "";
+
   @override
   void initState() {
     super.initState();
@@ -102,6 +104,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       "rider_phone": userCurrentInfo!.phone,
       "pickup_address": pickUp.placeName,
       "dropoff_address": dropOff.placeName,
+      "ride_type": carRideType,
     };
     rideRequestRef!.set(rideInfoMap);
     rideStreamSubscription = rideRequestRef!.onValue.listen((event) async {
@@ -307,6 +310,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         await AssistantMethods.searchCoordinateAddress(position, context);
     print("This is your Address ::" + address);
     initGeoFireListener();
+    uName = userCurrentInfo!.name.toString();
   }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
@@ -343,9 +347,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Profile Name",
+                            uName,
                             style: TextStyle(
-                                fontSize: 16.0, fontFamily: "Brand Bold"),
+                                fontSize: 16.0,
+                                fontFamily: "Brand Bold",
+                                color: Colors.black),
                           ),
                           SizedBox(
                             height: 6.0,
@@ -665,9 +671,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     //bike ride
                     GestureDetector(
                       onTap: () {
-                        displayToastMessage("Searching Bike", context);
+                        displayToastMessage("Searching Bike...", context);
                         setState(() {
                           state = "requesting";
+                          carRideType = "bike";
                         });
                         displayRequestRideContainer();
                         availableDrivers =
@@ -714,7 +721,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                               Expanded(child: Container()),
                               Text(
                                 ((tripDirectionDetails != null)
-                                    ? "Tk ${AssistantMethods.calculateFares(tripDirectionDetails!)}"
+                                    ? "Tk ${(AssistantMethods.calculateFares(tripDirectionDetails!)) / 2}"
                                     : ''),
                                 style: TextStyle(
                                   fontFamily: "Brand Bold",
@@ -743,6 +750,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         displayToastMessage("Searching Uber-Go", context);
                         setState(() {
                           state = "requesting";
+                          carRideType = "uber-go";
                         });
                         displayRequestRideContainer();
                         availableDrivers =
@@ -818,6 +826,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         displayToastMessage("Searching Uber-X", context);
                         setState(() {
                           state = "requesting";
+                          carRideType = "uber-x";
                         });
                         displayRequestRideContainer();
                         availableDrivers =
@@ -864,7 +873,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                               Expanded(child: Container()),
                               Text(
                                 ((tripDirectionDetails != null)
-                                    ? "Tk ${AssistantMethods.calculateFares(tripDirectionDetails!)}"
+                                    ? "Tk ${(AssistantMethods.calculateFares(tripDirectionDetails!)) * 2}"
                                     : ''),
                                 style: TextStyle(
                                   fontFamily: "Brand Bold",
@@ -1344,8 +1353,25 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       return;
     }
     var driver = availableDrivers![0];
-    notifyDriver(driver);
-    availableDrivers!.removeAt(0);
+    driversRef
+        .child(driver.key)
+        .child("car_details")
+        .child("type")
+        .once()
+        .then((DataSnapshot snap) async {
+      if (await snap.value != null) {
+        String carType = snap.value.toString();
+        if (carType == carRideType) {
+          notifyDriver(driver);
+          availableDrivers!.removeAt(0);
+        } else {
+          displayToastMessage(
+              carRideType + "drivers not available.Try again", context);
+        }
+      } else {
+        displayToastMessage(carRideType + "No car found.Try again", context);
+      }
+    });
   }
 
   void notifyDriver(NearbyAvailableDrivers driver) {
