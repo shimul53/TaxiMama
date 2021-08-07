@@ -235,7 +235,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     setState(() {
       requestRideDetailsContainerHeight = 250.0;
       rideDetailsContainerHeight = 0;
-      bottomPaddingOfMap = 270.0;
+      bottomPaddingOfMap = 290.0;
       drawerOpen = true;
     });
     saveRideRequest();
@@ -270,7 +270,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     setState(() {
       rideDetailsContainerHeight = 0.0;
       requestRideDetailsContainerHeight = 0.0;
-      bottomPaddingOfMap = 280.0;
+      bottomPaddingOfMap = 290.0;
       driverDetailsContainerHeight = 310.0;
     });
   }
@@ -281,7 +281,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       searchContainerHeight = 300.0;
       rideDetailsContainerHeight = 0;
       requestRideDetailsContainerHeight = 0;
-      bottomPaddingOfMap = 230.0;
+      bottomPaddingOfMap = 290.0;
       polylineSet.clear();
       markersSet.clear();
       circlesSet.clear();
@@ -683,7 +683,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       },
                       child: Container(
                         width: double.infinity,
-                        color: Colors.tealAccent[100],
+                        color: Colors.white,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),
                           child: Row(
@@ -759,7 +759,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       },
                       child: Container(
                         width: double.infinity,
-                        color: Colors.tealAccent[100],
+                        color: Colors.white,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),
                           child: Row(
@@ -835,7 +835,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       },
                       child: Container(
                         width: double.infinity,
-                        color: Colors.tealAccent[100],
+                        color: Colors.white,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),
                           child: Row(
@@ -1417,73 +1417,3 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     });
   }
 }
-
-// Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// Container(
-// height: 55.0,
-// width: 55.0,
-// decoration: BoxDecoration(
-// borderRadius:
-// BorderRadius.all(Radius.circular(26.0)),
-// border:
-// Border.all(width: 2.0, color: Colors.black),
-// ),
-// child: Icon(
-// Icons.call,
-// color: Colors.black,
-// ),
-// ),
-// SizedBox(
-// height: 10.0,
-// ),
-// Text("Call"),
-// ],
-// ),
-// Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// Container(
-// height: 55.0,
-// width: 55.0,
-// decoration: BoxDecoration(
-// borderRadius:
-// BorderRadius.all(Radius.circular(26.0)),
-// border:
-// Border.all(width: 2.0, color: Colors.black),
-// ),
-// child: Icon(
-// Icons.list,
-// color: Colors.black,
-// ),
-// ),
-// SizedBox(
-// height: 10.0,
-// ),
-// Text("Details"),
-// ],
-// ),
-// Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// Container(
-// height: 55.0,
-// width: 55.0,
-// decoration: BoxDecoration(
-// borderRadius:
-// BorderRadius.all(Radius.circular(26.0)),
-// border:
-// Border.all(width: 2.0, color: Colors.black),
-// ),
-// child: Icon(
-// Icons.close,
-// color: Colors.black,
-// ),
-// ),
-// SizedBox(
-// height: 10.0,
-// ),
-// Text("Cancel"),
-// ],
-// ),
